@@ -81,20 +81,17 @@ export default function App() {
   const [isAdminRoute] = useState(() => window.location.pathname.includes('/admin-owner-zone'));
   const [adminAuth, setAdminAuth] = useState({ loggedIn: false, key: '' });
   const [adminData, setAdminData] = useState({ users: [], deposits: [], withdrawals: [], stats: {} });
-
-  const [adminData, setAdminData] = useState({ users: [], deposits: [], withdrawals: [], stats: {} });
   const [selectedUser, setSelectedUser] = useState(null);
   const [fundAmount, setFundAmount] = useState('');
-  const [adminForm, setAdminForm] = useState({
 
-   const modifyUserFund = async (action) => {
+  const modifyUserFund = async (action) => {
     if (!fundAmount || fundAmount <= 0) return alert("Valid amount daalo!");
     const res = await fetch(`${API}/admin/update-balance`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone: selectedUser.phone, amount: fundAmount, action })
     });
-    const data = await res.json();
+ const data = await res.json();
     if (data.success) {
       alert("Balance successfully updated!");
       setSelectedUser({ ...selectedUser, balance: data.newBalance });
@@ -103,7 +100,9 @@ export default function App() {
     } else {
       alert(data.message);
     }
-  }; 
+  };
+
+  const [adminForm, setAdminForm] = useState({
     rakePercent: 10,
     minWithdrawal: 100,
     merchantUpi: 'merchant@upi',
@@ -121,7 +120,7 @@ export default function App() {
   const [authName, setAuthName] = useState('');
   const [authPhone, setAuthPhone] = useState('');
   const [authPassword, setAuthPassword] = useState('');
-
+  
   const [systemConfig, setSystemConfig] = useState(adminForm);
   const [userSelectedTheme, setUserSelectedTheme] = useState('cyber');
   const [chosenTokenDesign, setChosenTokenDesign] = useState('sphere');
