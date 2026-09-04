@@ -197,7 +197,7 @@ export default function App() {
 
   const fetchAdminData = async () => {
     try {
-      const res = await fetch(`${API}/admin/full-overview`);
+      const res = await fetch(`${API}/api/admin/full-overview`);
       const data = await res.json();
       setAdminData(data);
       setAdminForm(data.config);
