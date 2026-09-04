@@ -126,7 +126,7 @@ export default function App() {
 
   const findMatch = (mode, stake) => {
     if (user.balance < stake) return alert("Insufficient balance!");
-    setSearchStatus('Searching for opponent...');
+    setSearchStatus('Searching for opponent (Bot matchmaking active after 15-20s if queue empty)...');
     socket.emit('find_match', { mode, stake, phone: user.phone });
   };
 
@@ -185,7 +185,7 @@ export default function App() {
           <button onClick={() => setView('login')} style={{ padding: '8px 15px', background: '#dc3545', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: '5px' }}>Logout / Home</button>
         </div>
 
-        <h3>Registered Users (Click user to manage profile & balance)</h3>
+        <h3>Registered Users (Click to view profile & manage funds)</h3>
         <table style={{ width: '100%', marginTop: '10px', borderCollapse: 'collapse', textAlign: 'center', background: '#1e1e1e' }}>
           <thead>
             <tr style={{ background: '#2c2c2c' }}>
