@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Ludo Supreme</string>
+    <string name="title_activity_main">Ludo Supreme</string>
+    <string name="package_name">com.ludo.arena</string>
+    <string name="custom_url_scheme">com.ludo.arena</string>
+</resources>
