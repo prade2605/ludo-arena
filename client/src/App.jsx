@@ -84,6 +84,7 @@ export default function App() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [fundAmount, setFundAmount] = useState('');
 
+  // 🟢 Yeh function yahan bilkul bahar hona chahiye (kisi style ya object ke andar nahi)
   const modifyUserFund = async (action) => {
     if (!fundAmount || fundAmount <= 0) return alert("Valid amount daalo!");
     const res = await fetch(`${API}/admin/update-balance`, {
@@ -91,7 +92,7 @@ export default function App() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone: selectedUser.phone, amount: fundAmount, action })
     });
- const data = await res.json();
+    const data = await res.json();
     if (data.success) {
       alert("Balance successfully updated!");
       setSelectedUser({ ...selectedUser, balance: data.newBalance });
@@ -110,6 +111,8 @@ export default function App() {
     notice: '🚀 Welcome to Ludo Supreme VIP. Instant auto deposits & fast payouts live!',
     apkDownloadUrl: ''
   });
+  
+  // Baaki ka code...
 
   const [currentUser, setCurrentUser] = useState(() => {
     const s = localStorage.getItem('ludo_player_session');
@@ -120,7 +123,7 @@ export default function App() {
   const [authName, setAuthName] = useState('');
   const [authPhone, setAuthPhone] = useState('');
   const [authPassword, setAuthPassword] = useState('');
-  
+
   const [systemConfig, setSystemConfig] = useState(adminForm);
   const [userSelectedTheme, setUserSelectedTheme] = useState('cyber');
   const [chosenTokenDesign, setChosenTokenDesign] = useState('sphere');
@@ -210,7 +213,7 @@ export default function App() {
   }, [isAdminRoute, adminAuth.loggedIn]);
 
   const handleAuth = async () => {
-    const endpoint = authMode === 'register' ? '/register' : '/login';
+    const endpoint = authMode === 'register' ? '/api/register' : '/api/login';
     const payload = authMode === 'register' ? { name: authName, phone: authPhone, password: authPassword } : { phone: authPhone, password: authPassword };
     try {
       const res = await fetch(`${API}${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
