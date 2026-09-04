@@ -4,25 +4,22 @@ import io from 'socket.io-client';
 const socket = io('https://ludo-arena.onrender.com');
 
 export default function App() {
-  const [view, setView] = useState('login'); // 'login', 'home', 'game', 'admin'
+  const [view, setView] = useState('login');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [user, setUser] = useState(null);
   const [notice, setNotice] = useState('🚀 Welcome to Ludo Supreme VIP');
   
-  // Wallet states
   const [depositAmount, setDepositAmount] = useState('');
   const [utr, setUtr] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [upi, setUpi] = useState('');
 
-  // Game states
   const [gameData, setGameData] = useState(null);
   const [diceVal, setDiceVal] = useState(null);
   const [searchStatus, setSearchStatus] = useState('');
 
-  // Admin states
   const [adminData, setAdminData] = useState({ users: [], deposits: [], withdrawals: [], config: {} });
   const [selectedUser, setSelectedUser] = useState(null);
   const [fundAmount, setFundAmount] = useState('');
@@ -54,7 +51,6 @@ export default function App() {
     };
   }, []);
 
-  // Auth Handlers
   const handleLogin = async (e) => {
     e.preventDefault();
     const res = await fetch('https://ludo-arena.onrender.com/api/login', {
@@ -99,7 +95,6 @@ export default function App() {
     }
   };
 
-  // Wallet Handlers
   const submitDeposit = async () => {
     const res = await fetch('https://ludo-arena.onrender.com/api/wallet/submit-deposit', {
       method: 'POST',
@@ -129,14 +124,12 @@ export default function App() {
     }
   };
 
-  // Matchmaking
   const findMatch = (mode, stake) => {
     if (user.balance < stake) return alert("Insufficient balance!");
-    setSearchStatus('Searching for opponent (Bot matchmaking active if queue empty)...');
+    setSearchStatus('Searching for opponent...');
     socket.emit('find_match', { mode, stake, phone: user.phone });
   };
 
-  // Admin Dashboard Fetch & Actions
   const loadAdminDashboard = async () => {
     const res = await fetch('https://ludo-arena.onrender.com/api/admin/full-overview');
     const data = await res.json();
@@ -161,17 +154,6 @@ export default function App() {
       alert(data.message);
     }
   };
-
-  const handleAdminAction = async (endpoint, id, action) => {
-    await fetch(`https://ludo-arena.onrender.com/api/admin/${endpoint}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, action })
-    });
-    loadAdminDashboard();
-  };
-
-  // --- VIEWS ---
 
   if (view === 'login') {
     return (
@@ -203,7 +185,7 @@ export default function App() {
           <button onClick={() => setView('login')} style={{ padding: '8px 15px', background: '#dc3545', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: '5px' }}>Logout / Home</button>
         </div>
 
-        <h3>Registered Users (Click to view profile & manage funds)</h3>
+        <h3>Registered Users (Click user to manage profile & balance)</h3>
         <table style={{ width: '100%', marginTop: '10px', borderCollapse: 'collapse', textAlign: 'center', background: '#1e1e1e' }}>
           <thead>
             <tr style={{ background: '#2c2c2c' }}>
@@ -227,7 +209,6 @@ export default function App() {
           </tbody>
         </table>
 
-        {/* User Profile Modal */}
         {selectedUser && (
           <div style={{ position: 'fixed', top: '25%', left: '35%', background: '#222', padding: '25px', border: '2px solid #555', width: '360px', borderRadius: '8px', zIndex: 1000, boxShadow: '0 5px 15px rgba(0,0,0,0.7)' }}>
             <span onClick={() => setSelectedUser(null)} style={{ float: 'right', cursor: 'pointer', color: 'red', fontWeight: 'bold', fontSize: '20px' }}>&times;</span>
@@ -294,7 +275,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Wallet Section */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '30px', flexWrap: 'wrap' }}>
         <div style={{ background: '#1e1e1e', padding: '20px', borderRadius: '10px', width: '320px', border: '1px solid #444' }}>
           <h4>Deposit Money</h4>
