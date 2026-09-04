@@ -409,16 +409,16 @@ export default function App() {
                 </tr>
               </thead>
               <tbody>
-                {adminData.users.map(u => (
-                  <tr key={u.phone} style={{ borderBottom: '1px solid #333' }}>
-                    <td style={{ padding: '10px', border: '1px solid #444' }}>{u.name}</td>
-                    <td style={{ padding: '10px', border: '1px solid #444' }}>{u.phone}</td>
-                    <td style={{ padding: '10px', border: '1px solid #444' }}>₹{u.balance}</td>
-                    <td style={{ padding: '10px', border: '1px solid #444' }}>
-                      <button onClick={() => setSelectedUser(u)} style={{ padding: '5px 10px', background: '#ffc107', border: 'none', cursor: 'pointer', borderRadius: '4px', fontWeight: 'bold' }}>View Profile</button>
-                    </td>
-                  </tr>
-                ))}
+                {adminData?.users?.map(u => (
+  <tr key={u.phone} style={{ borderBottom: '1px solid #333' }}>
+    <td style={{ padding: '10px', border: '1px solid #444' }}>{u.name}</td>
+    <td style={{ padding: '10px', border: '1px solid #444' }}>{u.phone}</td>
+    <td style={{ padding: '10px', border: '1px solid #444' }}>₹{u.balance}</td>
+    <td style={{ padding: '10px', border: '1px solid #444' }}>
+      <button type="button" onClick={() => setSelectedUser(u)} style={{ padding: '5px 10px', background: '#ffc107', border: 'none', cursor: 'pointer', borderRadius: '4px', fontWeight: 'bold' }}>View Profile</button>
+    </td>
+  </tr>
+))}
               </tbody>
             </table>
           </div>
