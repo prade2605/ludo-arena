@@ -15,11 +15,12 @@ const io = new Server(server, {
   }
 });
 
-// In-Memory Database (Production ke liye MongoDB/PostgreSQL use kar sakte hain, abhi instant testing ke liye yeh best hai)
+// In-Memory Database
 let users = [];
 let deposits = [];
 let withdrawals = [];
 let games = [];
+let waitingQueue = []; // Secret Bot Matchmaking ke liye queue
 
 let systemConfig = {
   rakePercent: 10,
@@ -95,6 +96,28 @@ app.get('/api/admin/full-overview', (req, res) => {
   });
 });
 
+// Admin Profile & User Management Features Added Here
+app.get('/api/admin/users', (req, res) => {
+  res.json({ success: true, users });
+});
+
+app.post('/api/admin/update-balance', (req, res) => {
+  const { phone, amount, action } = req.body;
+  const user = users.find(u => u.phone === phone);
+  if (!user) return res.json({ success: false, message: 'User nahi mila' });
+
+  const numAmount = Number(amount);
+  if (action === 'add') {
+    user.balance += numAmount;
+  } else if (action === 'deduct') {
+    user.balance -= numAmount;
+    if (user.balance < 0) user.balance = 0;
+  }
+
+  io.emit('balance_synced', user.balance);
+  res.json({ success: true, newBalance: user.balance });
+});
+
 app.post('/api/admin/save-settings', (req, res) => {
   systemConfig = { ...systemConfig, ...req.body };
   io.emit('system_config_updated', systemConfig);
@@ -137,7 +160,7 @@ app.post('/api/admin/action-withdraw', (req, res) => {
   res.json({ success: true });
 });
 
-// --- SOCKET.IO GAME ENGINE ---
+// --- SOCKET.IO GAME ENGINE WITH SECRET BOT MATCHMAKING ---
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
@@ -151,23 +174,39 @@ io.on('connection', (socket) => {
     const colorsPool = ['red', 'green', 'yellow', 'blue'];
     const assignedColor = colorsPool[Math.floor(Math.random() * mode)];
 
-    const gameId = 'GAME_' + Date.now();
-    const prize = stake * mode * (1 - systemConfig.rakePercent / 100);
-    stats.totalRakeProfit += (stake * mode) * (systemConfig.rakePercent / 100);
+    // Queue me daalo match ke liye
+    const queueItem = { socket, user, mode, stake, assignedColor };
+    waitingQueue.push(queueItem);
 
-    const gameSession = {
-      id: gameId,
-      prize,
-      players: [{ phone: user.phone, color: assignedColor, socketId: socket.id }]
-    };
-
-    games.push(gameSession);
-    socket.join(gameId);
-
-    // Instant match simulation for smooth gameplay
+    // 5 Seconds Timer: Agar real opponent na mile toh Bot assign kar do chupchap
     setTimeout(() => {
-      socket.emit('game_started', gameSession);
-    }, 1000);
+      const index = waitingQueue.indexOf(queueItem);
+      if (index !== -1) {
+        waitingQueue.splice(index, 1); // Queue se hatao
+
+        const gameId = 'GAME_' + Date.now();
+        const prize = stake * mode * (1 - systemConfig.rakePercent / 100);
+        stats.totalRakeProfit += (stake * mode) * (systemConfig.rakePercent / 100);
+
+        const botNames = ['Rahul_99', 'Amit_King', 'Vikas_07', 'Rohit_X'];
+        const botName = botNames[Math.floor(Math.random() * botNames.length)];
+
+        const gameSession = {
+          id: gameId,
+          prize,
+          players: [
+            { phone: user.phone, name: user.name, color: assignedColor, socketId: socket.id },
+            { phone: 'BOT_' + botName, name: botName, color: 'green', socketId: 'bot_socket' } // Secret Bot
+          ]
+        };
+
+        games.push(gameSession);
+        socket.join(gameId);
+        
+        // User ko lagega real match mila hai, par samne bot hoga
+        socket.emit('game_started', gameSession);
+      }
+    }, 5000);
   });
 
   socket.on('roll_dice', ({ gameId }) => {
@@ -180,7 +219,6 @@ io.on('connection', (socket) => {
   });
 });
 
-// Render par dynamic port assignment zaroori hai
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Ludo Supreme VIP Server running live on port ${PORT}`);
