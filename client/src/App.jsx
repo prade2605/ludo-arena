@@ -82,7 +82,28 @@ export default function App() {
   const [adminAuth, setAdminAuth] = useState({ loggedIn: false, key: '' });
   const [adminData, setAdminData] = useState({ users: [], deposits: [], withdrawals: [], stats: {} });
 
+  const [adminData, setAdminData] = useState({ users: [], deposits: [], withdrawals: [], stats: {} });
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [fundAmount, setFundAmount] = useState('');
   const [adminForm, setAdminForm] = useState({
+
+   const modifyUserFund = async (action) => {
+    if (!fundAmount || fundAmount <= 0) return alert("Valid amount daalo!");
+    const res = await fetch(`${API}/admin/update-balance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: selectedUser.phone, amount: fundAmount, action })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert("Balance successfully updated!");
+      setSelectedUser({ ...selectedUser, balance: data.newBalance });
+      setFundAmount('');
+      fetchAdminData();
+    } else {
+      alert(data.message);
+    }
+  }; 
     rakePercent: 10,
     minWithdrawal: 100,
     merchantUpi: 'merchant@upi',
